@@ -1,7 +1,12 @@
 var express = require('express');
+var session = require('express-session');
 var app = express();
 var request = require('request');
 var _ = require('lodash');
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+
+// Google Maps API Key AIzaSyAyzcJb41FFwvQeK0z_eLQV1RH5v7Ccpys
 
 // This responds with "Hello World" on the homepage
 app.get('/', function (req, res) {
@@ -18,8 +23,8 @@ app.get('/', function (req, res) {
           var info = JSON.parse(body);
           console.log("Got a GET request for the homepage");
           console.log('info: ', info.results);
-          var spaces = _.map(info.results, 'address')
-          res.send('Hello Emily! ' + spaces);
+          var spaces = info.results;
+          res.render('index', { reports: spaces });
         } else {
             res.send('err')
         }

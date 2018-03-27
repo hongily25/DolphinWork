@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <p class="lead">Dolphin Work</p>
+      </div>
+
+      Hello Em!
+
+      <% if (reports.length > 0) { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let report of reports) { %>
+          <tr>
+            <th scope="row">
+                <%= report.name %><br>
+                <a href="<%= report.url %>"><img src="<%= report.picture_url %>" style="max-width:150px"></a>
+            </th>
+            <td><%= report.address %></td>
+            <td><%= report.average_rating %></td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+      <% } %>
+
+    </div>
+  </body>
+</html>
