@@ -9,46 +9,11 @@
         <p class="lead">Dolphin Work</p>
       </div>
 
-      Hello Em!
+      Welcome to Dolphin Work! To find a coworking space, select one of the below.
+      <br><br>
 
-      <% if (reports.length > 0) { %>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Rating</th>
-            <th>Certified</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% for (let report of reports) { %>
-          <tr>
-            <th scope="row">
-                <%= report.name %><br>
-                <a href="<%= report.url %>"><img src="<%= report.picture_url %>" style="max-width:150px"></a>
-            </th>
-            <td><%= report.address %></td>
-            <td>
-                <% if (report.average_rating == null) { %>
-                    Not rated
-                <% } else { %>
-                    <%= report.average_rating %>
-                <% } %>
-            </td>
-            <td>
-                <% if (report.certified) { %>
-                    Yes
-                <% } else { %> 
-                    No
-                <% } %>
-            </td>
-          </tr>
-          <% } %>
-        </tbody>
-      </table>
-      <% } %>
-
+      <a href="/?city=Chicago">Chicago</a><br><br>
+      <a href="/?city=Los%20Angeles">Los Angeles</a>
     </div>
   </body>
 </html>

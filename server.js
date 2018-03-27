@@ -5,16 +5,19 @@ var request = require('request');
 var _ = require('lodash');
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
+const ejsLint = require('ejs-lint');
 
 // Google Maps API Key AIzaSyAyzcJb41FFwvQeK0z_eLQV1RH5v7Ccpys
 
 // This responds with "Hello World" on the homepage
 app.get('/', function (req, res) {
-    var city = 'Los%20Angeles';
-    
-    if (req.query.city != null) {
+    var city;
+
+    if (req.query.city == null) {
+        res.render('index', { reports: [] })
+    } else {
         city = req.query.city;
-    } 
+    }
 
     var options = {
         url: 'https://card4b-masai-masai-coworkingcoffee-stg-v1.p.mashape.com/coworkingspace/api/discovery/getCoWorkingSpaces?City=' + city,
@@ -24,13 +27,20 @@ app.get('/', function (req, res) {
           'X-Mashape-Key': 'ShedIfdxswmsh7n7BWdKbLix2oxep1oKrryjsnl9MPWgR9vWwa'
         }
       };
+
       function callback(error, response, body) {
         if (!error && response.statusCode == 200) {
           var info = JSON.parse(body);
           console.log("Got a GET request for the homepage");
           console.log('info: ', info.results);
           var spaces = info.results;
-          res.render('index', { reports: spaces });
+          function makeCoords(n) {
+              return { lat: n.lat, lng: n.lng, info: n.name }
+          }
+          var locations = _.map(spaces, makeCoords);
+          console.log(locations);
+          var names = _.map(spaces, 'name');
+          res.render('city', { reports: spaces, coords: locations, titles: names});
         } else {
             res.send('err')
         }
