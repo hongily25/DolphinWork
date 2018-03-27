@@ -10,8 +10,14 @@ app.set('views', __dirname + '/views');
 
 // This responds with "Hello World" on the homepage
 app.get('/', function (req, res) {
+    var city = 'Los%20Angeles';
+    
+    if (req.query.city != null) {
+        city = req.query.city;
+    } 
+
     var options = {
-        url: 'https://card4b-masai-masai-coworkingcoffee-stg-v1.p.mashape.com/coworkingspace/api/discovery/getCoWorkingSpaces?City=Los%20Angeles',
+        url: 'https://card4b-masai-masai-coworkingcoffee-stg-v1.p.mashape.com/coworkingspace/api/discovery/getCoWorkingSpaces?City=' + city,
         headers: {
           'User-Agent': 'request',
           'Content-Type': 'application/json',

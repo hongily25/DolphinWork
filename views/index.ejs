@@ -18,6 +18,7 @@
             <th>Name</th>
             <th>Location</th>
             <th>Rating</th>
+            <th>Certified</th>
           </tr>
         </thead>
         <tbody>
@@ -28,7 +29,20 @@
                 <a href="<%= report.url %>"><img src="<%= report.picture_url %>" style="max-width:150px"></a>
             </th>
             <td><%= report.address %></td>
-            <td><%= report.average_rating %></td>
+            <td>
+                <% if (report.average_rating == null) { %>
+                    Not rated
+                <% } else { %>
+                    <%= report.average_rating %>
+                <% } %>
+            </td>
+            <td>
+                <% if (report.certified) { %>
+                    Yes
+                <% } else { %> 
+                    No
+                <% } %>
+            </td>
           </tr>
           <% } %>
         </tbody>
