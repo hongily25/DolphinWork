@@ -13,6 +13,8 @@ app.use(express.static('public'));
 
 // This responds with "Hello World" on the homepage
 app.get('/', function (req, res) {
+    res.send('hello world');
+    
     var city = 'Lisbon';
 
     if (req.query.city == null) {
