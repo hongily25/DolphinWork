@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <head>
-        <style>
-                #map {
-                  width: 100%;
-                  height: 400px;
-                  background-color: grey;
-                }
-                #map a:focus, a:hover {
-                    text-decoration: none !important
-                }
-              </style>
+  <head> 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
   </head>
   <body>
+      <div id="header">
+        <div class="inner-header container">
+          <div class="logo-head container">DOLPHIN WORK</div>
+        <img src="images/emilylam.jpg">
+        </div>
+      </div>
     <div class="container">
     <br><br>
     <div id="map"></div>
@@ -23,10 +20,11 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Name</th>
+            <th style="padding-left: 20px">Name</th>
             <th>Location</th>
             <th>Rating</th>
             <th>Certified</th>
+            <th>Reserve a Booking</th>
           </tr>
         </thead>
         <tbody>
@@ -50,6 +48,9 @@
                 <% } else { %> 
                     No
                 <% } %>
+            </td>
+            <td class="reserve">
+              <button class="btn btn-info">Reserve Now</button>
             </td>
           </tr>
           <% } %>

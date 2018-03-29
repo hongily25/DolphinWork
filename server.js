@@ -7,6 +7,8 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 const ejsLint = require('ejs-lint');
 
+app.use(express.static('public'));
+
 // Google Maps API Key AIzaSyAyzcJb41FFwvQeK0z_eLQV1RH5v7Ccpys
 
 // This responds with "Hello World" on the homepage
