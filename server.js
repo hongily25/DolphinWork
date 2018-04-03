@@ -36,6 +36,9 @@ app.get('/', function (req, res) {
           var info = JSON.parse(body);
           console.log("Got a GET request for the homepage");
           console.log('info: ', info.results);
+          if (info.results.length < 1) {
+              res.render('no-results');
+          }
           var spaces = info.results;
           function makeCoords(n) {
               return { lat: n.lat, lng: n.lng, info: n.name }
