@@ -1,11 +1,11 @@
 {
-  "name": "shopwave",
+  "name": "Dolphin Work",
   "version": "1.0.0",
   "description": "Shop Wave",
-  "main": "main.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js"
+    "start": "node server.js"
   },
   "author": "Emily Lam",
   "license": "ISC",
