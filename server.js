@@ -1,89 +1,234 @@
-var express = require('express');
-var session = require('express-session');
-var app = express();
-var request = require('request');
-var _ = require('lodash');
-app.set('view engine', 'ejs');
-app.set('views', __dirname + '/views');
-const ejsLint = require('ejs-lint');
+const express = require('express')
+const path = require('path')
+var request = require('request')
+var _ = require('lodash')
+const ejsLint = require('ejs-lint')
+const bodyparser=require('body-parser');
+const PORT = process.env.PORT || 5000;
 
-app.use(express.static('public'));
-
-// Google Maps API Key AIzaSyAyzcJb41FFwvQeK0z_eLQV1RH5v7Ccpys
-
-// This responds with "Hello World" on the homepage
-app.get('/', function (req, res) {
-
+express()
+  .use(express.static(path.join(__dirname, 'public')))
+  .use(bodyparser.json())
+  .use(bodyparser.urlencoded({extended:true}))
+  .set('views', path.join(__dirname, 'views'))
+  .set('view engine', 'ejs')
+  .get('/', function (req, res) {
     var city = 'Lisbon';
 
     if (req.query.city == null) {
-        res.render('index', { reports: [] })
+        return res.render('pages/index', { reports: [] })
     } else {
         city = req.query.city;
     }
 
     var options = {
-        url: 'https://card4b-masai-masai-coworkingcoffee-stg-v1.p.mashape.com/coworkingspace/api/discovery/getCoWorkingSpaces?City=' + city,
-        headers: {
-          'User-Agent': 'request',
-          'Content-Type': 'application/json',
-          'X-Mashape-Key': 'ShedIfdxswmsh7n7BWdKbLix2oxep1oKrryjsnl9MPWgR9vWwa'
-        }
-      };
-
-      function callback(error, response, body) {
-        if (!error && response.statusCode == 200) {
-          var info = JSON.parse(body);
-          console.log("Got a GET request for the homepage");
-          console.log('info: ', info.results);
-          if (info.results.length < 1) {
-              res.render('no-results');
-          }
-          var spaces = info.results;
-          function makeCoords(n) {
-              return { lat: n.lat, lng: n.lng, info: n.name }
-          }
-          var locations = _.map(spaces, makeCoords);
-          console.log(locations);
-          var names = _.map(spaces, 'name');
-          res.render('city', { reports: spaces, coords: locations, titles: names});
-        } else {
-            res.send('err')
-        }
+      url: 'https://card4b-masai-masai-coworkingcoffee-stg-v1.p.mashape.com/coworkingspace/api/discovery/getCoWorkingSpaces?City=' + city,
+      headers: {
+        'User-Agent': 'request',
+        'Content-Type': 'application/json',
+        'X-Mashape-Key': 'ShedIfdxswmsh7n7BWdKbLix2oxep1oKrryjsnl9MPWgR9vWwa'
       }
-       
-      request(options, callback);       
+    };
 
-})
+    function callback(error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var info = JSON.parse(body);
+        //console.log("Got a GET request for the homepage");
+        //console.log('info: ', info.results);
+        var spaces = info.results;
 
-// This responds a POST request for the homepage
-app.post('/', function (req, res) {
-   console.log("Got a POST request for the homepage");
-   res.send('Hello POST');
-})
+        try {
+            var latExists = spaces[0].lat
+        } catch(error) {
+            return res.render('pages/no-results')
+        }
 
-// This responds a DELETE request for the /del_user page.
-app.delete('/del_user', function (req, res) {
-   console.log("Got a DELETE request for /del_user");
-   res.send('Hello DELETE');
-})
+        if (info == null) {
+            console.log('info.results.length', info.results);
+            return res.render('pages/no-results');
+        } 
+        if (info.length < 1) {
+            console.log('city', req.body.city);
+            console.log('info.results.length', info.results);
+            return res.render('pages/no-results');
+        } 
+        
+        function makeCoords(n) {
+            return { lat: n.lat, lng: n.lng, info: n.name }
+        }
+        var locations = _.map(spaces, makeCoords);
 
-// This responds a GET request for the /list_user page.
-app.get('/list_user', function (req, res) {
-   console.log("Got a GET request for /list_user");
-   res.send('Page Listing');
-})
+        console.log(spaces);
+        var names = _.map(spaces, 'name');
+        var msgCity = req.query.city;
+        return res.render('pages/city', { reports: spaces, firstLat: spaces[0].lat, firstLng: spaces[0].lng, coords: locations, titles: names, msg: msgCity});
+      } else {
+          return res.send('err')
+      }
+    }
+    request(options, callback); 
 
-// This responds a GET request for abcd, abxcd, ab123cd, and so on
-app.get('/ab*cd', function(req, res) {   
-   console.log("Got a GET request for /ab*cd");
-   res.send('Page Pattern Match');
-})
+  })
+  .post('/availability', function (req, res) {
+    //console.log('req.body: ', req.body);
+    console.log('req.query.city', req.query.city);
 
-var server = app.listen(8081, function () {
+    var passengers, coworklat, coworklng, date, useraddress, userzipcode; 
 
-   var host = server.address().address
-   var port = server.address().port
+    if(req.body.Passengers) {
+      passengers = req.body.Passengers
+    } else passengers = "1";
 
-   console.log("Example app listening at http://%s:%s", host, port)
-})
+    if(req.body.coworklat) {
+      coworklat = req.body.coworklat
+    } else coworklat = "33.9811714";
+
+    if(req.body.coworklng) {
+      coworklng = req.body.coworklng
+    } else coworklng = "-118.4157892";
+
+    if(req.body.useraddress) {
+      useraddress = req.body.useraddress;
+    } else useraddress = "1875 Century Park East"
+
+    if(req.body.userzipcode) {
+      userzipcode = req.body.zipcode;
+    } else userzipcode = "90067"
+
+    var coworkingaddress = req.body.address.split(',');
+    console.log('coworking address', coworkingaddress);
+
+    var coworkingZipcode = coworkingaddress[2].replace(/\D/g,'');
+    console.log('coworkingZipcode: ', coworkingZipcode);
+
+    var coworkingState = coworkingaddress[2].split(' ');
+
+    var options = {
+      url: 'https://sgrdapi.linksrez.net/api/v1/Ground/Availability',
+      headers: {
+        'Content-Type': 'application/json',
+        'Username': 'sandbox',
+        'Password': 'sandbox'
+      },
+      body: JSON.stringify({
+          "Passengers": [
+              {
+                  "Quantity": passengers,
+                  "Category": {
+                      "Value": "Adult"
+                  }
+              }
+          ],
+          "Service": {
+              "Pickup": {
+                  "DateTime": "04/12/2018 11:00 PM",
+                  "Address": {
+                      "AddressLine": useraddress.address,
+                      "CityName": req.query.city,
+                      "PostalCode": useraddress.zipcode,
+                      "LocationType": {
+                          "Value": "HomeResidence"
+                      },
+                      "StateProv": {
+                        "StateCode": useraddress.StateCode
+                      },
+                      "CountryName": {
+                        "Code": useraddress.CountryName
+                      }
+                  }
+              },
+              "Dropoff": {
+                  "Address": {
+                      "AddressLine": coworkingaddress[0],
+                      "CityName": req.body.city,
+                      "PostalCode": coworkingZipcode,
+                      "LocationType": {
+                          "Value": "HomeResidence"
+                      },
+                      "StateProv": {
+                          "StateCode": coworkingState[0]
+                      },
+                      "CountryName": {
+                          "Code": coworkingaddress[3]
+                      },
+                      "Latitude": coworklat,
+                      "Longitude": coworklng
+                  }
+              }
+          }
+      })      
+    };
+
+    console.log('options.body ', options.body);
+    
+
+    request.post(options, function callback(error, response, body) {
+
+        /*
+      if (!error && response.statusCode == 200) {
+        var info = JSON.parse(body);
+        
+        try {
+            var superShuttleExists = info.data.SuperShuttle[0];
+        } catch(error) {
+            return res.render('pages/no-results')
+        }
+        
+        
+        var img = "https:" + info.data.SuperShuttle[0].GroundServices.GroundServices[0].Reference.TPA_Extensions.ImageURL;
+        console.log('this is my info. ', img);
+        var rideInfo = info.data.SuperShuttle[0].RateQualifiers[0].RateQualifierValue;
+
+        var startDateRideInfo = info.data.SuperShuttle[0].GroundServices.GroundServices[0].Reference.TPA_Extensions.PickupTimes.PickupTimes[0].StartDateTime;
+
+        var startDateRideInfoArray = Array.from(startDateRideInfo);
+        startDateRideInfoArray.splice(9, 0, ' at ');
+
+        startDateRideInfoArray.splice(13, 3, '');
+
+        startDateRideInfoArray.splice(16, 0, ' ');
+        startDateRideInfo = startDateRideInfoArray.join('');
+
+        var costInfo = info.data.SuperShuttle[0].GroundServices.GroundServices[0].TotalCharge.EstimatedTotalAmount;
+
+        var descInfo = info.data.SuperShuttle[0].GroundServices.GroundServices[0].RateQualifier.Category.Description;
+
+        var descInfoArray = Array.from(descInfo);
+        descInfoArray.splice(8, 0, ' ');
+        descInfo = descInfoArray.join('');
+
+        var maxPassengers = info.data.SuperShuttle[0].GroundServices.GroundServices[0].Reference.TPA_Extensions.MaxPassengers;
+
+        var serviceLevelCodeInfo = info.data.SuperShuttle[0].GroundServices.GroundServices[0].Service.ServiceLevel.Code;
+
+        var vehicleTypeInfo = info.data.SuperShuttle[0].GroundServices.GroundServices[0].Service.VehicleType.Code;
+
+        img = "https://cdn.supershuttle.com/service/2/20151118RS5072312.jpg";
+        rideInfo = "SuperShuttle";
+        startDateRideInfo = "April 12 at 11:00 PM";
+        costInfo = 100;
+        maxPassengers = 7;
+        descInfo = "Non-Stop Ride";
+        vehicleTypeInfo = "BLUE V";
+
+        
+        return res.render('pages/ride-service', {imgURL: img, rideService: rideInfo, startDateRide: startDateRideInfo, cost: costInfo, max: maxPassengers, passengerCount: req.body.Passengers, desc: descInfo, vehicleType: vehicleTypeInfo, city: req.query.city})
+      } else {
+        return res.send(error);
+      } */
+
+        var img = "https://cdn.supershuttle.com/service/2/20151118RS5072312.jpg";
+        var rideInfo = "SuperShuttle";
+        var startDateRideInfo = "April 12 at 11:00 PM";
+        var costInfo = 100;
+        var maxPassengers = 7;
+        var descInfo = "Non-Stop Ride";
+        var vehicleTypeInfo = "BLUE V";
+
+      return res.render('pages/ride-service', {imgURL: img, rideService: rideInfo, startDateRide: startDateRideInfo, cost: costInfo, max: maxPassengers, passengerCount: req.body.Passengers, desc: descInfo, vehicleType: vehicleTypeInfo, city: req.query.city})
+
+    });
+
+
+  })
+  .listen(PORT, () => console.log(`Listening on ${ PORT }`))
