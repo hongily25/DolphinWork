@@ -164,7 +164,7 @@ express()
 
     request.post(options, function callback(error, response, body) {
 
-        /*
+        
       if (!error && response.statusCode == 200) {
         var info = JSON.parse(body);
         
@@ -203,19 +203,20 @@ express()
 
         var vehicleTypeInfo = info.data.SuperShuttle[0].GroundServices.GroundServices[0].Service.VehicleType.Code;
 
-        img = "https://cdn.supershuttle.com/service/2/20151118RS5072312.jpg";
+       /* img = "https://cdn.supershuttle.com/service/2/20151118RS5072312.jpg";
         rideInfo = "SuperShuttle";
         startDateRideInfo = "April 12 at 11:00 PM";
         costInfo = 100;
         maxPassengers = 7;
         descInfo = "Non-Stop Ride";
         vehicleTypeInfo = "BLUE V";
+        */
 
         
         return res.render('pages/ride-service', {imgURL: img, rideService: rideInfo, startDateRide: startDateRideInfo, cost: costInfo, max: maxPassengers, passengerCount: req.body.Passengers, desc: descInfo, vehicleType: vehicleTypeInfo, city: req.query.city})
       } else {
         return res.send(error);
-      } */
+      } 
 
         var img = "https://cdn.supershuttle.com/service/2/20151118RS5072312.jpg";
         var rideInfo = "SuperShuttle";
